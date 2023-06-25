@@ -6,6 +6,7 @@ import com.example.IdentityReconciliation.models.ContactWebResponse;
 
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,10 +37,12 @@ public class ContactServiceHelper {
         String primaryPhoneNumber = primaryContact.get(0).getPhoneNumber();
 
         List<String> secondaryEmails = secondaryContacts.stream()
+                .filter(contactEntity -> contactEntity.getEmail()!=null)
                 .map(ContactEntity::getEmail)
                 .collect(Collectors.toList());
 
         List<String> secondaryPhoneNumbers = secondaryContacts.stream()
+                .filter(contactEntity -> contactEntity.getPhoneNumber()!=null)
                 .map(ContactEntity::getPhoneNumber)
                 .collect(Collectors.toList());
 
@@ -51,7 +54,11 @@ public class ContactServiceHelper {
         phoneNumbers.add(primaryPhoneNumber);
         phoneNumbers.addAll(secondaryPhoneNumbers);
 
-        List<Long> secondaryIds = secondaryContacts.stream().map(ContactEntity::getId).collect(Collectors.toList());
+        List<Long> secondaryIds = secondaryContacts.stream()
+                .filter(contactEntity -> contactEntity.getEmail()!=null
+                &&contactEntity.getPhoneNumber()!=null)
+                .map(ContactEntity::getId)
+                .collect(Collectors.toList());
 
         ContactWebResponse contactWebResponse = new ContactWebResponse();
         contactWebResponse.setPrimaryContactId(primaryContact.get(0).getId());
