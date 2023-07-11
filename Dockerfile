@@ -1,4 +1,3 @@
-FROM adoptopenjdk:11-jre-hotspot
-ARG JAR_FILE=*.jar
-COPY target/${JAR_FILE} application.jar
-ENTRYPOINT ["java", "-jar", "application.jar"]
+FROM amazoncorretto:11-alpine-jdk
+COPY target/identity-reconciliation.jar identity-reconciliation.jar
+ENTRYPOINT ["java", "-jar", "/identity-reconciliation.jar"]
