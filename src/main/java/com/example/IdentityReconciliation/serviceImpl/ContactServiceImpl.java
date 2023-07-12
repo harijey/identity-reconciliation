@@ -59,33 +59,29 @@ public class ContactServiceImpl implements ContactService {
                 = ContactServiceHelper.groupByEmail(contactEntityList, contactWebRequest.getEmail());
         List<ContactEntity> contactsGroupedByPhoneNumber
                 = ContactServiceHelper.groupByPhoneNumber(contactEntityList, contactWebRequest.getPhoneNumber());
-        if(contactsGroupedByPhoneNumber.size()+contactsGroupedByEmail.size()!=contactEntityList.size()){
+        if (contactsGroupedByPhoneNumber.size() + contactsGroupedByEmail.size() != contactEntityList.size()) {
             isAlreadyPresent = Boolean.TRUE;
         }
         contactEntityList.clear();
 
-        if(CollectionUtils.isEmpty(contactsGroupedByEmail)){
-            Long linkedId= ContactServiceHelper
+        if (CollectionUtils.isEmpty(contactsGroupedByEmail)) {
+            Long linkedId = ContactServiceHelper
                     .getPrimaryId(contactsGroupedByPhoneNumber);
-            contactsGroupedByPhoneNumber=
-                    contactRepo.findByIdOrLinkedId(linkedId,linkedId);
+            contactsGroupedByPhoneNumber =
+                    contactRepo.findByIdOrLinkedId(linkedId, linkedId);
             contactEntity.setLinkedId(linkedId);
             contactEntityList.add(contactEntity);
-            if(!isAlreadyPresent) {
-                contactRepo.save(contactEntity);
-            }
+            addEntityToList(contactEntity, isAlreadyPresent);
             contactEntityList.addAll(contactsGroupedByPhoneNumber);
             return ContactServiceHelper.buildResponse(contactEntityList);
-        }else if(CollectionUtils.isEmpty(contactsGroupedByPhoneNumber)){
-            Long linkedId =  ContactServiceHelper
+        } else if (CollectionUtils.isEmpty(contactsGroupedByPhoneNumber)) {
+            Long linkedId = ContactServiceHelper
                     .getPrimaryId(contactsGroupedByEmail);
-            contactsGroupedByEmail=contactRepo.findByIdOrLinkedId(linkedId,linkedId);
+            contactsGroupedByEmail = contactRepo.findByIdOrLinkedId(linkedId, linkedId);
             contactEntity.setLinkedId(linkedId);
             contactEntityList.add(contactEntity);
             contactEntityList.addAll(contactsGroupedByEmail);
-            if(!isAlreadyPresent) {
-                contactRepo.save(contactEntity);
-            }
+            addEntityToList(contactEntity, isAlreadyPresent);
             return ContactServiceHelper.buildResponse(contactEntityList);
         }
 
@@ -96,21 +92,21 @@ public class ContactServiceImpl implements ContactService {
         (There must be a match for both)
          */
 
-        Long primaryMailId =  ContactServiceHelper
+        Long primaryMailId = ContactServiceHelper
                 .getPrimaryId(contactsGroupedByEmail);
-        contactsGroupedByEmail=contactRepo.findByIdOrLinkedId(primaryMailId,primaryMailId);
+        contactsGroupedByEmail = contactRepo.findByIdOrLinkedId(primaryMailId, primaryMailId);
 
-        Long primaryPhoneId =  ContactServiceHelper
+        Long primaryPhoneId = ContactServiceHelper
                 .getPrimaryId(contactsGroupedByPhoneNumber);
-        contactsGroupedByPhoneNumber=
-                contactRepo.findByIdOrLinkedId(primaryPhoneId,primaryPhoneId);
+        contactsGroupedByPhoneNumber =
+                contactRepo.findByIdOrLinkedId(primaryPhoneId, primaryPhoneId);
 
         ContactEntity emailPrimaryAccount = getPrimaryAccount(contactsGroupedByEmail);
         ContactEntity phoneNumberPrimaryAccount = getPrimaryAccount(contactsGroupedByPhoneNumber);
 
         if (primaryPhoneId.equals(primaryMailId)) {
             contactEntity.setLinkedId(primaryMailId);
-            if(!isAlreadyPresent) {
+            if (!isAlreadyPresent) {
                 contactRepo.save(contactEntity);
                 contactEntityList.add(contactEntity);
             }
@@ -124,7 +120,7 @@ public class ContactServiceImpl implements ContactService {
                 contactEntity.setLinkedId(phoneNumberPrimaryAccount.getId());
                 ContactServiceHelper.setNewLinkedIdAndLinkPrecedence(contactsGroupedByEmail, phoneNumberPrimaryAccount.getId());
             }
-            if(!isAlreadyPresent) {
+            if (!isAlreadyPresent) {
                 contactEntityList.add(contactEntity);
             }
             contactEntityList.addAll(contactsGroupedByEmail);
@@ -134,9 +130,15 @@ public class ContactServiceImpl implements ContactService {
         return ContactServiceHelper.buildResponse(contactEntityList);
     }
 
+    private void addEntityToList(ContactEntity contactEntity, Boolean isAlreadyPresent) {
+        if (!isAlreadyPresent) {
+            contactRepo.save(contactEntity);
+        }
+    }
+
     private ContactEntity getPrimaryAccount(List<ContactEntity> contactEntityList) {
-        for(ContactEntity contact:contactEntityList){
-            if(LinkPrecedence.PRIMARY.equals(contact.getLinkPrecedence())){
+        for (ContactEntity contact : contactEntityList) {
+            if (LinkPrecedence.PRIMARY.equals(contact.getLinkPrecedence())) {
                 return contact;
             }
         }
