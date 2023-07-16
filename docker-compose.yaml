@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_USER: dockeruser
       POSTGRES_PASSWORD: dockerpassword
-      POSTGRES_DB: postgres
+      POSTGRES_DB: postgresql
     ports:
       - "5432:5432"
     volumes:
@@ -19,7 +19,7 @@ services:
     depends_on:
       - postgres
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/dockerdb
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgresql
       SPRING_DATASOURCE_USERNAME: dockeruser
       SPRING_DATASOURCE_PASSWORD: dockerpassword
 
