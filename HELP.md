@@ -2,11 +2,11 @@
 # Identity-Reconciliation
 
 ## Steps to Follow
-* Clone the git repository or run the below command. 
+* Clone the git repository or run the below command.
 ---
     git clone https://github.com/harijey/identity-reconciliation.git
 ---
-* Unzip the zip file into a directory.     
+* Unzip the zip file into a directory.
 * Open the project Directory.
 * Run the following command in the terminal => **docker-compose up**
 * Exposed Port : **9876**
@@ -22,7 +22,7 @@
     Note: Replace <EMAIL_ID> with the email and <PHONE_NUMBER> with phone number.
 ---
 
-    
+
 
     ---
     Back-End Framework: Springboot 2.7.7
